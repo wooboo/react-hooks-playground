@@ -1,0 +1,34 @@
+{
+  "name": "WebApplication4",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "16.8.3",
+    "react-dom": "16.8.3",
+    "react-scripts": "2.1.5",
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
+    "qs": "6.6.0"
+  },
+  "devDependencies": {
+    "rimraf": "2.6.3",
+    "ajv": "6.10.0",
+    "cross-env": "5.2.0"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "scripts": {
+    "start": "rimraf ./build && react-scripts start",
+    "build": "react-scripts build",
+    "test": "cross-env CI=true react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "lint": "eslint ./src/"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
