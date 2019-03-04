@@ -1,9 +1,9 @@
 import { withStyles } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import React from "react";
-import { postForm } from "./fetchUtils";
+import { postForm } from "./utils/fetchUtils";
 import Register from "./Register";
-import useJsonApi from "./useJsonApi";
+import useFetch from "./utils/useFetch";
 
 const styles = theme => ({
   main: {
@@ -20,13 +20,14 @@ const styles = theme => ({
 });
 
 function App({ classes }) {
-  const { data, isLoading, isError, doGet } = useJsonApi(
+  const { data } = useFetch(
     "/api/SampleData/WeatherForecasts"
   );
   return (
     <main className={classes.main}>
       <CssBaseline />
       <Register onSubmit={postForm("/api/SampleData/Register")} />
+      {data && data.map(d=><div key={d.dateFormatted}>{d.dateFormatted} {d.temperatureC}°C {d.summary} </div>)}
     </main>
   );
 }

@@ -1,15 +1,15 @@
 import { ErrorsSummary } from './components/ErrorsSummary';
 import React from "react";
 import Button from "@material-ui/core/Button";
-import { useForm, useField } from "./formHooks";
+import { useForm, useField } from "./utils/formHooks";
 import Field from "./components/Field";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Paper from "@material-ui/core/Paper";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { getValidation } from "./fetchUtils";
-import { minLength, match } from "./validators";
+import { getValidation } from "./utils/fetchUtils";
+import { minLength, match } from "./utils/validators";
 
 const styles = theme => ({
   paper: {
