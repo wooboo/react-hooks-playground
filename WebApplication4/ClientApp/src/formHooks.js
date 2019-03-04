@@ -5,27 +5,27 @@ export const useField = (
   form,
   { defaultValue, validations = [], fieldsToValidateOnChange = [name] } = {}
 ) => {
-  let [value, setValue] = useState(defaultValue);
-  let [errors, setErrors] = useState([]);
-  let [pristine, setPristine] = useState(true);
-  let [validating, setValidating] = useState(false);
-  let validateCounter = useRef(0);
+  const [value, setValue] = useState(defaultValue);
+  const [errors, setErrors] = useState([]);
+  const [pristine, setPristine] = useState(true);
+  const [validating, setValidating] = useState(false);
+  const validateCounter = useRef(0);
 
   const validate = async () => {
-    let validateIteration = ++validateCounter.current;
+    const validateIteration = ++validateCounter.current;
     setValidating(true);
-    let formData = form.getFormData();
+    const formData = form.getFormData();
     let errorMessages = await Promise.all(
       validations.map(validation => validation(formData, name))
     );
     errorMessages = errorMessages.filter(errorMsg => !!errorMsg);
     if (validateIteration === validateCounter.current) {
       // this is the most recent invocation
-      
+
       setErrors([].concat(...errorMessages));
       setValidating(false);
     }
-    let fieldValid = errorMessages.length === 0;
+    const fieldValid = errorMessages.length === 0;
     return fieldValid;
   };
 
@@ -54,9 +54,10 @@ export const useField = (
 };
 
 export const useForm = ({ onSubmit }) => {
-  let [submitted, setSubmitted] = useState(false);
-  let [submitting, setSubmitting] = useState(false);
-  let fields = [];
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState([]);
+  const fields = [];
 
   const validateFields = async fieldNames => {
     let fieldsToValidate;
@@ -68,10 +69,10 @@ export const useForm = ({ onSubmit }) => {
       //if fieldNames not provided, validate all fields
       fieldsToValidate = fields;
     }
-    let fieldsValid = await Promise.all(
+    const fieldsValid = await Promise.all(
       fieldsToValidate.map(field => field.validate())
     );
-    let formValid = fieldsValid.every(isValid => isValid === true);
+    const formValid = fieldsValid.every(isValid => isValid === true);
     return formValid;
   };
 
@@ -91,13 +92,20 @@ export const useForm = ({ onSubmit }) => {
       try {
         return await onSubmit(getFormData(), formValid);
       } catch (error) {
-        const errors = await error;
-
-        for (const field of fields) {
-          var err = errors[field.name];
-          if(err){
-            field.setErrors([...field.errors, ...err]);
-          }
+        const err = await error;
+        if (typeof err === "string") {
+          setErrors([...errors, err]);
+        } else if (Array.isArray(err)) {
+          setErrors([...errors, ...err.filter(o => typeof o === "string")]);
+        } else {
+          Object.entries(err).forEach(([key, value]) => {
+            const field = fields.filter(o => o.name === key);
+            if (field && field.length) {
+              field.forEach(f => f.setErrors([...f.errors, ...value]));
+            } else {
+              setErrors([...errors, ...value]);
+            }
+          });
         }
       } finally {
         setSubmitting(false);
@@ -108,6 +116,7 @@ export const useForm = ({ onSubmit }) => {
     getFormData,
     validateFields,
     submitted,
-    submitting
+    submitting,
+    errors
   };
 };

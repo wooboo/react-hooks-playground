@@ -1,3 +1,4 @@
+import { ErrorsSummary } from './components/ErrorsSummary';
 import React from "react";
 import Button from "@material-ui/core/Button";
 import { useForm, useField } from "./formHooks";
@@ -8,6 +9,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { getValidation } from "./fetchUtils";
+import { minLength, match } from "./validators";
 
 const styles = theme => ({
   paper: {
@@ -30,22 +32,6 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   }
 });
-
-function minLength(min, message) {
-  return (formData, field) => {
-    if (formData[field].length < min) {
-      return message;
-    }
-  };
-}
-
-function match(withField, message){
-  return (formData, field) => {
-    if (formData[field] !== formData[withField]) {
-      return message;
-    }
-  };
-}
 
 function Register({ onSubmit, classes }) {
   const form = useForm({
@@ -72,7 +58,6 @@ function Register({ onSubmit, classes }) {
   });
 
   let requiredFields = [usernameField, passwordField, confirmPasswordField];
-
   return (
     <Paper className={classes.paper}>
       <Avatar className={classes.avatar}>
@@ -82,6 +67,7 @@ function Register({ onSubmit, classes }) {
         Register
       </Typography>
       <form onSubmit={form.onSubmit}>
+        <ErrorsSummary errors={form.errors} fullWidth/>
         <Field
           {...usernameField}
           formSubmitted={form.submitted}

@@ -20,7 +20,7 @@ export default function Field({
   fullWidth,
   ...other
 }) {
-  let showErrors = (!pristine || formSubmitted) && !!errors.length;
+  const showErrors = (!pristine || formSubmitted) && !!errors.length;
   return (
     <FormControl className="field" error={showErrors} fullWidth={fullWidth}>
       <InputLabel htmlFor={name}>{label}</InputLabel>

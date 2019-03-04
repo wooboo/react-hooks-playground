@@ -32,27 +32,34 @@ export function getFetch(url = ``) {
     //body: JSON.stringify(data) // body data type must match "Content-Type" header
   });
 }
+
+async function handleResponse(response) {
+  const contentType = response.headers.get("content-type");
+  let result;
+  if (contentType && contentType.startsWith("application/json")) {
+    result = await response.json();
+  } else {
+    result = await response.text();
+  }
+
+  if (response.status >= 200 && response.status < 300) {
+    return result;
+  } else if (response.status >= 400 || response.status < 600) {
+    throw result;
+  }
+}
+
 export function postForm(url) {
   return async (formData, valid) => {
     if (!valid) return;
     const response = await postFetch(url, formData);
-    if (response.status === 200) {
-      return await response.json();
-    } else if (response.status === 204) {
-      return await response.text();
-    } else if (response.status === 400) {
-      throw await response.json();
-    }
+    return await handleResponse(response);
   };
 }
 
 export function getValidation(url) {
   return async formData => {
     const response = await getFetch(`${url}?${stringify(formData)}`);
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.startsWith("application/json")) {
-      return await response.json();
-    }
-    return await response.text();
+    return await handleResponse(response);
   };
 }
