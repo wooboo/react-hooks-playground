@@ -23,7 +23,7 @@ const useFetch = (url, init = {}) => {
       })
       .catch(err => {
         const error = err.name !== "AbortError" ? err : null;
-
+        console.dir(err);
         setState(oldState => ({
           ...oldState,
           error,

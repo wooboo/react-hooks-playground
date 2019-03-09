@@ -2,24 +2,39 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace WebApplication4.Controllers
 {
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
+        private readonly ILogger _logger;
+        public SampleDataController(ILogger<SampleDataController> logger)
+        {
+            _logger = logger;
+        }
         private static string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
         [HttpGet("[action]")]
-        public IEnumerable<WeatherForecast> WeatherForecasts()
+        public async Task<IEnumerable<WeatherForecast>> WeatherForecasts(string area, CancellationToken cancellationToken)
         {
             var rng = new Random();
+
+            for (int i = 0; i < 10; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await Task.Delay(1000);
+            }
+            
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
+                Area = area,
                 DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
@@ -30,8 +45,6 @@ namespace WebApplication4.Controllers
         [ValidateModelState]
         public async Task<ActionResult> Register([FromBody]RegisterModel model)
         {
-            return BadRequest("Something went wrong");
-
             return NoContent();
         }
 
@@ -54,7 +67,7 @@ namespace WebApplication4.Controllers
             public string DateFormatted { get; set; }
             public int TemperatureC { get; set; }
             public string Summary { get; set; }
-
+            public string Area { get; set; }
             public int TemperatureF
             {
                 get
@@ -62,6 +75,7 @@ namespace WebApplication4.Controllers
                     return 32 + (int)(TemperatureC / 0.5556);
                 }
             }
+
         }
     }
 }
